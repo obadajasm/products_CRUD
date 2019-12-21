@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mx_crud/models/product.dart';
 
 import 'components/price_tag_widget.dart';
 import 'components/product_card_widget.dart';
 
 class Products extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
+  final List<Product> products;
 
   Products([this.products = const []]);
 

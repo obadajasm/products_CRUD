@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mx_crud/models/product.dart';
 import 'package:mx_crud/pages/auth.dart';
 import 'package:mx_crud/pages/home.dart';
 import 'package:mx_crud/pages/product.dart';
@@ -15,9 +16,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Map<String, dynamic>> _products = [];
+  List<Product> _products = [];
 
-  void _addProduct(Map<String, dynamic> product) {
+  void _addProduct(Product product) {
     setState(() {
       _products.add(product);
     });
@@ -29,7 +30,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void _updateProduct(int index, Map<String, dynamic> product) {
+  void _updateProduct(int index, Product product) {
     setState(() {
       _products[index] = product;
     });
@@ -57,8 +58,10 @@ class _MyAppState extends State<MyApp> {
           print('index form main $index');
           return MaterialPageRoute<bool>(
             builder: (contex) => ProductPage(
-                title: _products[index]['title'],
-                imageURL: _products[index]['image']),
+                title: _products[index].title,
+                imageURL: _products[index].imageURL,
+                price: _products[index].price.toString(),
+                description: _products[index].description),
           );
         }
         return null;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mx_crud/models/product.dart';
 
 import 'package:mx_crud/pages/product_edit.dart';
 import 'package:mx_crud/pages/product_list.dart';
@@ -7,7 +8,7 @@ class ProudctsAdminPage extends StatelessWidget {
   final Function _deleteProduct;
   final Function _updateProduct;
   final Function _addProduct;
-  final List<Map<String, dynamic>> _product;
+  final List<Product> _product;
   ProudctsAdminPage(this._addProduct, this._deleteProduct, this._updateProduct,
       this._product);
 

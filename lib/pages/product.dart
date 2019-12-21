@@ -5,7 +5,9 @@ import 'package:mx_crud/ui_elements/title_defualt_widget.dart';
 class ProductPage extends StatelessWidget {
   final String title;
   final String imageURL;
-  ProductPage({this.title, this.imageURL});
+  final String price;
+  final String description;
+  ProductPage({this.title, this.imageURL, this.price, this.description});
 
   @override
   Widget build(BuildContext context) {
