@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mx_crud/models/product.dart';
+import 'package:mx_crud/scoped-models/product_model.dart';
+import 'package:scoped_model/scoped_model.dart';
 import '../product_manager.dart';
 
 class HomePage extends StatelessWidget {
-  final List<Product> products;
-
-  HomePage(this.products);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,13 +27,21 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('EasyList'),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.favorite),
-            onPressed: () {},
+          ScopedModelDescendant<ProductModel>(
+            builder: (Container, _, model) {
+              return IconButton(
+                icon: Icon(model.displayFavOnly
+                    ? Icons.favorite
+                    : Icons.favorite_border),
+                onPressed: () {
+                  model.toogleDisplayMode();
+                },
+              );
+            },
           )
         ],
       ),
-      body: ProductManager(products),
+      body: ProductManager(),
     );
   }
 }

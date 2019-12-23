@@ -5,13 +5,6 @@ import 'package:mx_crud/pages/product_edit.dart';
 import 'package:mx_crud/pages/product_list.dart';
 
 class ProudctsAdminPage extends StatelessWidget {
-  final Function _deleteProduct;
-  final Function _updateProduct;
-  final Function _addProduct;
-  final List<Product> _product;
-  ProudctsAdminPage(this._addProduct, this._deleteProduct, this._updateProduct,
-      this._product);
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -45,8 +38,8 @@ class ProudctsAdminPage extends StatelessWidget {
         ),
         body: TabBarView(
           children: <Widget>[
-            ProductEditPage(addProduct: _addProduct),
-            ProductListPage(_product, _updateProduct, _deleteProduct)
+            ProductEditPage(),
+            ProductListPage(),
           ],
         ),
       ),

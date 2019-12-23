@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mx_crud/components/price_tag_widget.dart';
 import 'package:mx_crud/models/product.dart';
+import 'package:mx_crud/scoped-models/product_model.dart';
 import 'package:mx_crud/ui_elements/title_defualt_widget.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 import 'address_widget.dart';
 
@@ -46,10 +48,19 @@ class ProductCardWidget extends StatelessWidget {
                     Navigator.pushNamed<bool>(context, '/product/$index');
                   },
                 ),
-                IconButton(
-                  color: Colors.red,
-                  icon: Icon(Icons.favorite_border),
-                  onPressed: () {},
+                ScopedModelDescendant<ProductModel>(
+                  builder: (context, _, model) {
+                    return IconButton(
+                      color: Colors.red,
+                      icon: Icon(model.products[index].isFavotirte
+                          ? Icons.favorite
+                          : Icons.favorite_border),
+                      onPressed: () {
+                        model.selectProduct(index);
+                        model.toogleProductFavStatus();
+                      },
+                    );
+                  },
                 )
               ],
             )
