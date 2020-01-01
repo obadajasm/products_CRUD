@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:mx_crud/models/product.dart';
 
 import 'package:mx_crud/pages/product_edit.dart';
 import 'package:mx_crud/pages/product_list.dart';
+import 'package:mx_crud/scoped-models/main_model.dart';
 
 class ProudctsAdminPage extends StatelessWidget {
+  MainModel model;
+  ProudctsAdminPage(this.model);
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -21,7 +23,7 @@ class ProudctsAdminPage extends StatelessWidget {
                 leading: Icon(Icons.shop),
                 title: Text('All Products'),
                 onTap: () {
-                  Navigator.pushReplacementNamed(context, '/');
+                  Navigator.pushReplacementNamed(context, '/products');
                 },
               )
             ],
@@ -39,7 +41,7 @@ class ProudctsAdminPage extends StatelessWidget {
         body: TabBarView(
           children: <Widget>[
             ProductEditPage(),
-            ProductListPage(),
+            ProductListPage(model),
           ],
         ),
       ),

@@ -4,9 +4,9 @@ import 'package:mx_crud/pages/auth.dart';
 import 'package:mx_crud/pages/home.dart';
 import 'package:mx_crud/pages/product.dart';
 import 'package:mx_crud/pages/products_admin.dart';
-import 'package:mx_crud/scoped-models/product_model.dart';
+import 'package:mx_crud/scoped-models/main_model.dart';
+
 import 'package:scoped_model/scoped_model.dart';
-// import 'package:flutter/rendering.dart';
 
 void main() {
   runApp(MyApp());
@@ -18,11 +18,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Product> _products = [];
-
   Widget build(BuildContext context) {
-    return ScopedModel<ProductModel>(
-      model: ProductModel(),
+    final MainModel mainModel = MainModel();
+    return ScopedModel<MainModel>(
+      model: mainModel,
       child: MaterialApp(
         theme: ThemeData(
             brightness: Brightness.light,
@@ -33,25 +32,28 @@ class _MyAppState extends State<MyApp> {
         routes: {
           // '/home': (context) => HomePage(_products),
           '/': (context) => AuthPage(),
-          '/admin': (context) => ProudctsAdminPage(),
+          '/admin': (context) => ProudctsAdminPage(mainModel),
+          '/products': (context) => HomePage(mainModel),
         },
         onGenerateRoute: (settings) {
           final List<String> pathElments = settings.name.split('/');
           if (pathElments[0] != '') return null;
           if (pathElments[1] == 'product') {
-            final int index = int.parse(pathElments[2]);
-            print('index form main $index');
+            final String productId = pathElments[2];
+            final Product product =
+                mainModel.products.firstWhere((Product product) {
+              return product.id == productId;
+            });
+
             return MaterialPageRoute<bool>(
-              builder: (contex) => ProductPage(
-                index: index,
-              ),
+              builder: (contex) => ProductPage(product),
             );
           }
           return null;
         },
         onUnknownRoute: (settings) {
           return MaterialPageRoute<bool>(
-            builder: (contex) => HomePage(),
+            builder: (contex) => HomePage(mainModel),
           );
         },
       ),

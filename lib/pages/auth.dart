@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mx_crud/scoped-models/main_model.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({Key key}) : super(key: key);
@@ -8,9 +10,24 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  String _emailValue;
-  String _passValue;
+  final Map<String, dynamic> _formData = {
+    'email': null,
+    'password': null,
+    'acceptTerms': null,
+  };
   bool _acceptTerms = false;
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  void _submitForm(Function login) {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+    _formKey.currentState.save();
+    login(_formData['email'], _formData['password']);
+    Navigator.pushReplacementNamed(context, '/products');
+  }
+
   @override
   Widget build(BuildContext context) {
     final double deiceWidth = MediaQuery.of(context).size.width;
@@ -33,56 +50,64 @@ class _AuthPageState extends State<AuthPage> {
           child: SingleChildScrollView(
             child: Container(
               width: targetWidth,
-              child: Column(
-                children: <Widget>[
-                  TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      onChanged: (value) {
-                        setState(() {
-                          _emailValue = value;
-                        });
-                      }),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      obscureText: true,
-                      onChanged: (value) {
-                        setState(() {
-                          _passValue = value;
-                        });
-                      }),
-                  SwitchListTile(
-                    title: Text(
-                      'ACCEPT ME :( ',
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (s) {
+                          if (!s.contains("@"))
+                            return 'please Endter a Valid Email';
+                        },
+                        onSaved: (value) {
+                          _formData['email'] = value;
+                        }),
+                    SizedBox(
+                      height: 10,
                     ),
-                    value: _acceptTerms,
-                    onChanged: (value) {
-                      setState(() {
-                        _acceptTerms = !_acceptTerms;
-                      });
-                    },
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  RaisedButton(
-                    child: Text('LOGIN'),
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/s');
-                    },
-                  )
-                ],
+                    TextFormField(
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        obscureText: true,
+                        onSaved: (value) {
+                          _formData['password'] = value;
+                        }),
+                    SwitchListTile(
+                      title: Text(
+                        'ACCEPT ME :( ',
+                      ),
+                      value: _acceptTerms,
+                      onChanged: (value) {
+                        setState(() {
+                          _acceptTerms = value;
+                          _formData['acceptTerms'] = value;
+                        });
+                      },
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    ScopedModelDescendant<MainModel>(
+                      builder: (context, _, model) {
+                        return RaisedButton(
+                          child: Text('LOGIN'),
+                          onPressed: () {
+                            _submitForm(model.login);
+                          },
+                        );
+                      },
+                    )
+                  ],
+                ),
               ),
             ),
           ),

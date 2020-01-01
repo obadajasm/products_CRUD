@@ -2,7 +2,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:mx_crud/models/product.dart';
-import 'package:mx_crud/scoped-models/product_model.dart';
+import 'package:mx_crud/scoped-models/main_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductEditPage extends StatefulWidget {
@@ -22,9 +22,9 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ProductModel>(builder: (context, _, model) {
+    return ScopedModelDescendant<MainModel>(builder: (context, _, model) {
       final Widget PageContent = _buildPageContent(context, model);
-      return model.selectedProductIndex == null
+      return model.selectedProductId == null
           ? PageContent
           : Scaffold(
               appBar: AppBar(
@@ -35,7 +35,20 @@ class _ProductEditPageState extends State<ProductEditPage> {
     });
   }
 
-  GestureDetector _buildPageContent(BuildContext context, ProductModel model) {
+  GestureDetector _buildPageContent(BuildContext context, MainModel model) {
+    Widget btn;
+    Widget _submit() {
+      return model.isLoading
+          ? Center(child: CircularProgressIndicator())
+          : btn = RaisedButton(
+              child: Text('Save'),
+              onPressed: () => _submitForm(
+                  model.addProduct,
+                  model.updateProduct,
+                  model.selectedProductId,
+                  model.selectProduct));
+    }
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
@@ -52,11 +65,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
               SizedBox(
                 height: 32.0,
               ),
-              RaisedButton(
-                child: Text('Save'),
-                onPressed: () => _submitForm(model.addProduct,
-                    model.updateProduct, model.selectedProductIndex),
-              )
+              _submit(),
             ],
           ),
         ),
@@ -64,36 +73,54 @@ class _ProductEditPageState extends State<ProductEditPage> {
     );
   }
 
-  _submitForm(
-      Function addProduct, Function updateProduct, int selectedIndexProduct) {
+  _submitForm(Function addProduct, Function updateProduct,
+      String selectedIndexProduct, Function setSelcetedProductIndex) {
     if (_formKey.currentState.validate()) return;
     _formKey.currentState.save();
 
-    if (selectedIndexProduct == null)
+    if (selectedIndexProduct == null) {
       addProduct(
-        Product(
-          title: _formData['title'],
-          description: _formData['description'],
-          imageURL: _formData['image'],
-          price: _formData['price'],
-        ),
-      );
-    else
+        _formData['title'],
+        _formData['description'],
+        _formData['image'],
+        _formData['price'],
+      ).then((success) {
+        if (success) {
+          Navigator.pushReplacementNamed(context, '/s')
+              .then((_) => setSelcetedProductIndex(null));
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Something went Wrong ......'),
+                content: Text('please try again ! '),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('ok'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  )
+                ],
+              );
+            },
+          );
+        }
+      });
+    } else {
       updateProduct(
-        Product(
-          title: _formData['title'],
-          description: _formData['description'],
-          imageURL: _formData['image'],
-          price: _formData['price'],
-        ),
-      );
-    Navigator.pushReplacementNamed(context, '/s');
+        _formData['title'],
+        _formData['description'],
+        _formData['image'],
+        _formData['price'],
+      ).then((_) => Navigator.pushReplacementNamed(context, '/s')
+          .then((_) => setSelcetedProductIndex(null)));
+    }
   }
 
   Widget _buildPriceTextField(Product product) {
     return TextFormField(
       validator: (s) {
-        if (s.isEmpty || !RegExp(r'^[0-9]+\$').hasMatch(s))
+        if (s.isEmpty || RegExp(r'^[0-9]+\$').hasMatch(s))
           return 'please enter a number';
       },
       initialValue: product == null ? '' : product.price.toString(),
