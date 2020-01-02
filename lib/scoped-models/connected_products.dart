@@ -10,52 +10,6 @@ class ContectedProductsModel extends Model {
   User _authUser;
   String _selectedProductId;
   bool _isLodaing = false;
-
-  Future<bool> addProduct(
-      String title, String description, String image, double price) {
-    _isLodaing = true;
-    notifyListeners();
-    final Map<String, dynamic> productData = {
-      'title': title,
-      'description': description,
-      'image':
-          "http://images5.fanpop.com/image/photos/31600000/choco-chocolate-31685044-422-264.jpg",
-      'price': price,
-      'userEmail': _authUser.email,
-      'userId': _authUser.id
-    };
-    return http
-        .post('https://maxcrud-a8e3f.firebaseio.com/products.json',
-            body: json.encode(productData))
-        .then((http.Response response) {
-      if (response.statusCode != 200 || response.statusCode != 201) {
-        _isLodaing = false;
-        notifyListeners();
-        return false;
-      }
-
-      final Map<String, dynamic> data = json.decode(response.body);
-
-      final Product newProduct = Product(
-          id: data['name'],
-          title: title,
-          description: description,
-          imageURL: image,
-          price: price,
-          userEmail: _authUser.email,
-          userId: _authUser.id);
-
-      _isLodaing = false;
-      _products.add(newProduct);
-
-      notifyListeners();
-      return true;
-    }).catchError((error) {
-      _isLodaing = false;
-      notifyListeners();
-      return false;
-    });
-  }
 }
 
 class ProductModel extends ContectedProductsModel {
@@ -97,6 +51,54 @@ class ProductModel extends ContectedProductsModel {
     return _products.firstWhere((Product product) {
       return product.id == _selectedProductId;
     });
+  }
+
+  Future<bool> addProduct(
+      String title, String description, String image, double price) async {
+    _isLodaing = true;
+    notifyListeners();
+    final Map<String, dynamic> productData = {
+      'title': title,
+      'description': description,
+      'image':
+          "http://images5.fanpop.com/image/photos/31600000/choco-chocolate-31685044-422-264.jpg",
+      'price': price,
+      'userEmail': _authUser.email,
+      'userId': _authUser.id
+    };
+
+    try {
+      final http.Response response = await http.post(
+          'https://maxcrud-a8e3f.firebaseio.com/products.json',
+          body: json.encode(productData));
+
+      if (response.statusCode != 200 || response.statusCode != 201) {
+        _isLodaing = false;
+        notifyListeners();
+        return false;
+      }
+
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      final Product newProduct = Product(
+          id: data['name'],
+          title: title,
+          description: description,
+          imageURL: image,
+          price: price,
+          userEmail: _authUser.email,
+          userId: _authUser.id);
+
+      _isLodaing = false;
+      _products.add(newProduct);
+
+      notifyListeners();
+      return true;
+    } catch (error) {
+      _isLodaing = false;
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<bool> deleteProduct() {
