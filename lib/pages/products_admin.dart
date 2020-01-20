@@ -38,10 +38,24 @@ class ProudctsAdminPage extends StatelessWidget {
             ],
           ),
         ),
-        body: TabBarView(
+        body: Column(
           children: <Widget>[
-            ProductEditPage(),
-            ProductListPage(model),
+            RaisedButton(
+              child: Text('go back'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            RaisedButton(
+              child: (Text('current User')),
+              onPressed: () {},
+            ),
+            TabBarView(
+              children: <Widget>[
+                ProductEditPage(),
+                ProductListPage(model),
+              ],
+            ),
           ],
         ),
       ),

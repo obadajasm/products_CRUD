@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
         //home: AuthPage(),
         routes: {
           // '/home': (context) => HomePage(_products),
-          '/': (context) => AuthPage(),
+          '/': (context) => AuthPage(mainModel),
           '/admin': (context) => ProudctsAdminPage(mainModel),
           '/products': (context) => HomePage(mainModel),
         },

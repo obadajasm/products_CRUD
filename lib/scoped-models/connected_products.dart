@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:mx_crud/models/product.dart';
 import 'package:mx_crud/models/user.dart';
@@ -223,8 +225,54 @@ class ProductModel extends ContectedProductsModel {
 }
 
 class UserModel extends ContectedProductsModel {
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
   void login(String email, String password) {
     _authUser = User(id: '3113', email: email, password: password);
+  }
+
+  Future<String> signUp(String email, String password) async {
+    String message;
+    try {
+      AuthResult res = await _firebaseAuth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      message = 'done';
+    } on PlatformException catch (e) {
+      message = 'Oops!'; // Default message
+      switch (e.code) {
+        case 'ERROR_WEAK_PASSWORD':
+          message = 'The password you entered is totally wrong!';
+          break;
+        case 'ERROR_INVALID_EMAIL':
+          message = 'The email you entered is totally wrong!';
+          break;
+      }
+    } catch (e) {
+      print('in catch $e');
+    }
+
+    return message;
+  }
+
+  Future<String> signIn(String email, String password) async {
+    String message = 'Somthing Went Wrong :( ';
+    try {
+      await _firebaseAuth.signInWithEmailAndPassword(
+          email: email, password: password);
+      message = 'done';
+    } on PlatformException catch (e) {
+      switch (e.code) {
+        case 'ERROR_USER_NOT_FOUND':
+          message = 'The email you entered is totally wrong!';
+          break;
+        case 'ERROR_WRONG_PASSWORD':
+          message = 'The password you entered is totally wrong!';
+          break;
+      }
+    } catch (e) {
+      print('in catch $e');
+    }
+    return message;
   }
 }
 
